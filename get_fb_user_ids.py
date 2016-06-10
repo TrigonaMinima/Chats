@@ -36,7 +36,9 @@ if __name__ == "__main__":
         print("Error: No or empty usernames file in 'FB/'")
         exit()
 
-    ids = open("FB/ids.txt", "a")
+    ids = open("FB/ids.csv", "a")
+    ids.write("id,name\n")
+
     usernames = dict(usernames)
     for friend in usernames:
         try:
@@ -45,7 +47,7 @@ if __name__ == "__main__":
             time.sleep(30)
             usernames[friend] = fetch(usernames[friend])
 
-        ids.write(usernames[friend] + "  " + friend + "\n")
+        ids.write(usernames[friend] + "," + friend + "\n")
         print(friend, usernames[friend])
 
     # print(usernames)
