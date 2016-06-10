@@ -1,0 +1,10 @@
+# File containing Configuration
+config.py
+
+# Conversation Dumps
+FB/*
+WhatsApp/*
+d3/*
+
+
+.ipynb_checkpoints/*
