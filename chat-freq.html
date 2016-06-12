@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Chatting Up</title>
+        <script type="text/javascript" src="d3/d3.js"></script>
+        <script type="text/javascript" src="d3/colorbrewer.js"></script>
+        <style type="text/css">
+            ./*axis path,
+            .axis line {
+                fill: none;
+                stroke: black;
+                shape-rendering: crispEdges;
+            }*/
+/*            .axis text {
+                font-family: sans-serif;
+                font-size: 11px;
+            }*/
+
+        </style>
+    </head>
+
+    <body>
+        <script type="text/javascript">
+
+        // Dataset loading
+        var dataset;
+        d3.csv("final_my_chats.csv", function(error, data){
+            if (error){
+                console.log(error);
+            }
+            else {
+                data.forEach(function(d) {
+                    // console.log(d);
+                    d.date = d3.time.format("%d/%m/%Y").parse(d.date);
+                    // console.log(d.date);
+                    d.time = d3.time.format("%I:%M:%S %p").parse(d.time);
+                    d.name = d.name.trim();
+                    d.cat = d.cat.trim();
+                });
+
+                dataset = data;
+                mainFunction();
+            }
+        });
+
+        var mainFunction = function(){
+            // var w = 600;
+            // var h = 400;
+            var pad = 20*2;
+            var areaWidth = 600;
+            var areaHeight = 340;
+
+            // http://bl.ocks.org/mbostock/3019563
+            var margin = {top: 20, right: 50, bottom: 20, left: 50};
+            var width = areaWidth - margin.left - margin.right;
+            var height = areaHeight - margin.top - margin.bottom;
+
+            // SVG made
+            var svg = d3.select("body")
+                .append("svg")
+                    .attr("width", width + margin.left + margin.right)
+                    .attr("height", height + margin.top + margin.bottom)
+                .append("g")
+                    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+            // Masking of the data points on the axes
+            svg.append("clipPath")
+                    .attr("id", "chart-area")
+                .append("rect")
+                    .attr({
+                        "x": 0,
+                        "y": 0,
+                        "width": width,
+                        "height": height
+                    });
+
+
+            // Common functions
+            var getD = function(d){
+                    return d.date;
+            };
+
+            var getT = function(d){
+                    return d.time;
+            };
+
+            var getN = function(d){
+                    return d.name;
+            };
+
+            // Defining x-scale
+            // var xMinDate = d3.min(dataset, getD);
+            var xMinDate = new Date(2011, 0, 0, 0);
+            // console.log(xMinDate);
+            var xMaxDate = d3.max(dataset, getD);
+
+            var xScale = d3.time.scale()
+                    .domain([xMinDate, xMaxDate])
+                    .range([0, width]);
+
+            // Defining y-scale
+            var yMinDate = new Date(0, 0, 0, 0);
+            var yMaxDate = new Date(0, 0, 0, 24);
+
+            var yScale = d3.time.scale()
+                    .domain([yMinDate, yMaxDate])
+                    .range([height, 0]);
+                    // .range([0, height]);
+
+            // Defining color scale
+            // var cScale = d3.scale.
+
+
+            // Drawing scatter plot
+            svg.append("g")
+                    .attr("id", "circles")
+                    .attr("clip-path", "url(#chart-area)")
+                    .selectAll("circle")
+                    .data(dataset)
+                    .enter()
+                .append("circle")
+                    .attr({
+                        "cx": function(d){
+                            return xScale(d.date);
+                        },
+                        "cy": function(d){
+                            // console.log(d.time)
+                            temp = new Date(0, 0, 0, d.time.getHours(), d.time.getMinutes(), d.time.getMinutes());
+                            return yScale(temp);
+                        },
+                        "r": 0.5,
+                        "fill": "red",
+                        "stroke-color": "black"
+                    });
+
+            // using triangle instead of circles
+            // svg.selectAll("path")
+            //         .data(dataset)
+            //         .enter()
+            //     .append("path")
+            //         .attr({
+            //             "d": d3.svg.symbol()
+            //                     .type("triangle-up")
+            //                     .size(2),
+            //             "transform": function(d) {
+            //                 temp = new Date(0, 0, 0, d.time.getHours(), d.time.getMinutes(), d.time.getMinutes());
+            //                 if (d.name == "Shivam Rana")
+            //                     return "translate(" + xScale(d.date) + "," + yScale(temp) + ") rotate(-90)";
+            //                 else
+            //                     return "translate(" + xScale(d.date) + "," + yScale(temp) + ") rotate(90)";
+            //             },
+            //             "stroke": "black",
+            //             "fill": "white",
+            //             "stroke-width": "0.5"
+            //         })
+
+            // Draw x-axis
+            var xAxis = d3.svg.axis()
+                    .scale(xScale)
+                    .orient("bottom")
+                    .tickFormat(d3.time.format('%Y'))
+                    // .tickFormat(d3.time.format('%d-%m-%y'))
+                    // .tickValues([xMinDate, xMaxDate]);
+
+            svg.append("g")
+                    .attr("class", "axis")
+                    .attr("transform", "translate(0, " + height + ")")
+                    .call(xAxis);
+
+            // Draw y-axis
+            var yAxis = d3.svg.axis()
+                    .scale(yScale)
+                    .orient("left")
+                    // .ticks(12)
+                    .ticks(d3.time.hours, 3)
+                    .tickFormat(d3.time.format("%I %p"));
+
+            svg.append("g")
+                    .attr("class", "axis y")
+                    .attr("transform", "translate(0, 0)")
+                    .call(yAxis);
+
+            svg.selectAll(".axis text")
+                    .style("font-family", "sans-serif")
+                    .style("font-size", "11px");
+
+            svg.selectAll(".axis path, .axis line")
+                    .style("fill", "none")
+                    .style("stroke", "black")
+                    .style("shape-rendering", "crispEdges");
+
+
+            // .axis path,
+            // .axis line {
+            //     fill: none;
+            //     stroke: black;
+            //     shape-rendering: crispEdges;
+            // }
+
+
+
+        };
+        </script>
+
+    </body>
+</html>
