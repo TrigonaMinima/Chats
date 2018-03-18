@@ -5,7 +5,7 @@ config-backup.py
 FB/*
 WhatsApp/*
 d3/*
-
+data/*
 
 .ipynb_checkpoints/*
 
