@@ -71,6 +71,9 @@ class TSWhatsApp(WhatsAppRaw):
     time_dict = {}
 
     def time_division_dict(self, group_sizes):
+        """
+        Utility function.
+        """
         time_dict = {}
         for group_size in group_sizes:
             interval = pd.Timedelta(60, "s") / group_size
@@ -84,6 +87,9 @@ class TSWhatsApp(WhatsAppRaw):
         return time_dict
 
     def time_division(self, group_sizes):
+        """
+        Utility function.
+        """
         times = []
         for group_size in group_sizes:
             group_times = self.time_dict[group_size]
@@ -108,10 +114,12 @@ class TSWhatsApp(WhatsAppRaw):
 
     def add_datetime(self, df):
         """
-        Makes a Datetime column from data and time columns.
+        Makes a Datetime column from date and time columns.
         """
         df["DATETIME"] = df.DATE.str.cat(df.TIME, sep=" ")
         df.DATETIME = pd.to_datetime(df.DATETIME)
+
+        df = df[["DATETIME", "FROM", "TEXT", "PERSON"]]
         print("\tDatetime added.")
         return df
 
@@ -154,6 +162,7 @@ class WhatsApp(TSWhatsApp):
         dfs = []
         for file in sorted(self.wp_clean.glob("*")):
             df = pd.read_csv(file)
+            df["PLATFORM"] = "WP"
             dfs.append(df)
 
         all_chats = pd.concat(dfs,  ignore_index=True)
