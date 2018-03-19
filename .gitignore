@@ -11,3 +11,5 @@ data/*
 
 final_all_chats.csv
 final_my_chats.csv
+
+*/*.csv
