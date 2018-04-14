@@ -47,16 +47,19 @@ class FBRaw(object):
 
     def extract_data(self, lines):
         """
-        Extracts the username, timestamp, replies from the raw data.
+        Extracts the username, timestamp, replies from the raw data
+        Note that, every column is reversed (using [::-1]), that's because,
+        in FB data dumps, the most recent message comes first and I wanted
+        to keep it in chronological order.
         """
         data = {}
-        data["PERSON"] = lines.title.string[18:]
+        data["PERSON"] = (lines.title.string[18:])
 
         thread = lines.body.find("div", class_="thread")
 
         timestamps = thread.find_all("span", class_="meta")
         timestamps = [timestamp.string.strip() for timestamp in timestamps]
-        data["TIMESTAMPS"] = timestamps
+        data["TIMESTAMPS"] = timestamps[::-1]
 
         replies = thread.find_all('p', recursive=False)
         # print(replies)
@@ -65,11 +68,11 @@ class FBRaw(object):
             replies = replies[1:]
 
         replies = list(map(self.clean_reply, replies))
-        data["TEXT"] = replies
+        data["TEXT"] = replies[::-1]
 
         users = thread.find_all("span", class_="user")
         users = list(map(self.clean_user, users))
-        data["FROM"] = users
+        data["FROM"] = users[::-1]
 
         print("\tData extracted!")
         return data
@@ -88,7 +91,8 @@ class FBRaw(object):
         # df.TEXT = df.TEXT.str.strip()
         df["PERSON"] = data["PERSON"]
 
-        df.DATETIME = pd.to_datetime(df.DATETIME)
+        # print(df.DATETIME.head(), df.DATETIME.str[:-10].head())
+        df.DATETIME = pd.to_datetime(df.DATETIME.str[:-10])
 
         print("\tDataframe made!")
         return df

@@ -117,7 +117,8 @@ class TSWhatsApp(WhatsAppRaw):
         Makes a Datetime column from date and time columns.
         """
         df["DATETIME"] = df.DATE.str.cat(df.TIME, sep=" ")
-        df.DATETIME = pd.to_datetime(df.DATETIME)
+        df.DATETIME = pd.to_datetime(
+            df.DATETIME, format="%d/%m/%Y %I:%M:%S %p")
 
         df = df[["DATETIME", "FROM", "TEXT", "PERSON"]]
         print("\tDatetime added.")
