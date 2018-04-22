@@ -13,3 +13,7 @@ final_all_chats.csv
 final_my_chats.csv
 
 */*.csv
+
+
+Code/save_plots_personal.py
+Exploration_Personal.ipynb
