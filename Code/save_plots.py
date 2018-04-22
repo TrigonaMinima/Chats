@@ -79,7 +79,7 @@ data["GRPFLG"] = data.PERSON.apply(lambda x: 1 if x in groups else 0)
 # string " and "
 cond1 = data.PERSON.astype(str).apply(
     lambda x: True if " and " in x.lower() else False)
-data.loc[cond1 | cond2, "GRPFLG"] = 1
+data.loc[cond1, "GRPFLG"] = 1
 
 # Adding time difference between replies
 data = data.sort_values(["PERSON", "DATETIME"]).reset_index(drop=True)
