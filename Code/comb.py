@@ -1,7 +1,7 @@
 import pandas as pd
 import os
 
-from config import fb_dir, wp_dir, data_dir
+from config import fb_dir, wp_dir, tg_dir, data_dir
 
 
 def combine(data_dir):
@@ -29,6 +29,10 @@ if __name__ == "__main__":
     fb_file = fb_dir / "all_chats.csv"
     all_fb = pd.read_csv(fb_file)
     print("Facebook data read!")
+
+    tg_file = tg_dir / "all_chats.csv"
+    all_tg = pd.read_csv(tg_file)
+    print("Telegram data read!")
 
     all_file = data_dir / "all_chats.csv"
     all_chats = pd.concat([all_wp, all_fb], ignore_index=True)
